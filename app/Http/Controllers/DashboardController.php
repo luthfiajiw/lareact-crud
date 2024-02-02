@@ -12,7 +12,12 @@ class DashboardController extends Controller
     {
         $posts = Post::with(['user' => function ($query) {
             $query->select('id', 'name', 'email');
-        }])->select('id', 'title', 'description', 'user_id')->paginate(10);
+        }])->select('id', 'title', 'user_id')->paginate($request->perPage ?? 10);
+
+        $posts->appends([
+            'page' => $request->page ?? 1,
+            'perPage' => $request->perPage ?? 10
+        ])->links();
 
         return Inertia::render('Dashboard', [
             'posts' => $posts

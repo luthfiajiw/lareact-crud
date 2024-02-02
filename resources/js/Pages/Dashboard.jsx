@@ -1,72 +1,92 @@
 import IconButton from '@/Components/IconButton';
+import Select from '@/Components/Select';
 import PrimaryButton from '@/Components/PrimaryButton';
+import TextInput from '@/Components/TextInput';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, router } from '@inertiajs/react';
+import { Head, Link, router, usePage } from '@inertiajs/react';
 import { MdOutlineEdit, MdDeleteOutline, MdAdd, MdSearch } from "react-icons/md";
+import { useState } from 'react';
 
-export default function Dashboard({ auth, posts, showModal }) {
+export default function Dashboard({ auth, posts }) {
+    const { props } = usePage()
+    const [perPage, setPerPage] = useState({
+        value: props.posts.per_page,
+        label: `${props.posts.per_page}`
+    })
     const cols = [
-        "title", "description", "author", "actions"
+        "no", "title", "author", "actions"
     ]
-    let pagesNav = []
 
-    for (let i = 1; i <= posts.last_page; i++) {
-        pagesNav.push(
-            <li>
-                <a 
-                    key={i}
-                    href="#"
-                    className={`flex items-center justify-center px-3 h-8 
-                        ${i === posts.current_page ? "text-blue-600 hover:text-blue-700 bg-blue-50" : "text-gray-500 hover:text-gray-700 bg-gray-50"} border border-gray-300 
-                        hover:bg-blue-100 dark:border-gray-700 dark:bg-gray-700 dark:text-white
-                    `}
-                >
-                    {i}
-                </a>
-            </li>
+    function handlePerPage(data) {
+        setPerPage(data)
+        router.get(
+            route().current(),
+            {
+                perPage: data.value,
+                page: props.posts.current_page,
+            },
+            {
+                preserveScroll: true,
+                preserveState: true
+            }
         )
     }
 
-    console.log(showModal);
     return (
         <AuthenticatedLayout
             user={auth.user}
-            header={<h2 className="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>}
+            header={(
+                <div className='flex flex-row items-center justify-between'>
+                    <h2 className="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>
+                    <PrimaryButton
+                        onClick={() => {}}
+                    >
+                        <div className='flex flex-row items-center space-x-2.5'>
+                            <MdAdd size={16} />
+                            <span>Add Post</span>
+                        </div>
+                    </PrimaryButton>
+                </div>
+            )}
         >
             <Head title="Dashboard" />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-6">
                 <div className='relative bg-white overflow-auto shadow-md rounded-md sm:rounded-lg'>
                     <div className='flex flex-row justify-between items-center px-4 my-4'>
+                        <div className='flex flex-row w- items-center space-x-2'>
+                            <p>Show</p>
+                            <Select
+                                width='w-20'
+                                selected={perPage}
+                                onChange={handlePerPage}
+                                data={[
+                                    {
+                                        value: 10,
+                                        label: "10",
+                                    },
+                                    {
+                                        value: 20,
+                                        label: "20",
+                                    },
+                                    {
+                                        value: 30,
+                                        label: "30",
+                                    },
+                                ]}
+                            />
+                        </div>
                         <label htmlFor="table-search" className="sr-only">Search</label>
-                        <div className="relative">
+                        <div className="relative w-[400px]">
                             <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
                                 <MdSearch />
                             </div>
-                            <input
-                                type="text"
-                                id="table-search"
-                                className="
-                                    block p-2 ps-10 text-sm text-gray-900 border border-gray-300
-                                    rounded-lg w-80 bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700
-                                    dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
-                                "
+                            <TextInput 
+                                type="search"
+                                className="ps-10 block w-full"
                                 placeholder="Search for items"
                             />
                         </div>
-                        <PrimaryButton
-                            onClick={() => {
-                                router.visit('/dashboard/create', {
-                                    replace: false,
-                                    preserveState: true, // This prevents the page from fully reloading
-                                })
-                            }}
-                        >
-                            <div className='flex flex-row items-center space-x-2.5'>
-                                <MdAdd size={16} />
-                                <span>Add Post</span>
-                            </div>
-                        </PrimaryButton>
                     </div>
                     <div className='block max-h-[500px] overflow-y-auto'>
                         <table className='w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400'>
@@ -80,14 +100,14 @@ export default function Dashboard({ auth, posts, showModal }) {
                                 </tr>
                             </thead>
                             <tbody className='max-h-[500px] overflow-y-auto'>
-                                {posts && posts.data.map(post => (
+                                {posts && posts.data.map((post, index) => (
                                     <tr key={post.id} className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'>
+                                        <td className='pl-6 py-4'>
+                                            {index + 1}
+                                        </td>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             {post.title}
                                         </th>
-                                        <td className='px-6 py-4'>
-                                            {post.description}
-                                        </td>
                                         <td className='px-6 py-4'>
                                             {post.user.name}
                                         </td>
