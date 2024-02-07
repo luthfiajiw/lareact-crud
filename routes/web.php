@@ -27,6 +27,8 @@ Route::get('/', function () {
 Route::middleware('auth')->group(function () {
     Route::prefix('dashboard')->group(function () {
         Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/create', [DashboardController::class, 'index'])->name('dashboard.create');
+        Route::post('/create', [DashboardController::class, 'store'])->name('dashboard.store');
     });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

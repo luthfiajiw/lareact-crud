@@ -10,9 +10,9 @@ export default function Select({
 }) {
 
   return (
-    <div className={`block ${width}`}>
+    <div className={`block ${width} h-full`}>
       <Listbox value={selected} onChange={onChange}>
-        <div className="relative mt-1">
+        <div className="relative">
           <Listbox.Button
             className="relative w-full cursor-default rounded-md bg-white
               py-2 pl-3 pr-10 text-left shadow-sm focus:outline-none border border-gray-300

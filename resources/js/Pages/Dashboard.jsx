@@ -5,9 +5,10 @@ import TextInput from '@/Components/TextInput';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
 import { Head, Link, router, usePage } from '@inertiajs/react';
 import { MdOutlineEdit, MdDeleteOutline, MdAdd, MdSearch } from "react-icons/md";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import ModalFormPost from '@/Components/ModalFormPost';
 
-export default function Dashboard({ auth, posts }) {
+export default function Dashboard({ auth, posts, create }) {
     const { props } = usePage()
     const [perPage, setPerPage] = useState({
         value: props.posts.per_page,
@@ -22,7 +23,7 @@ export default function Dashboard({ auth, posts }) {
         router.get(
             route().current(),
             {
-                perPage: data.value,
+                per_page: data.value,
                 page: props.posts.current_page,
             },
             {
@@ -32,6 +33,12 @@ export default function Dashboard({ auth, posts }) {
         )
     }
 
+    useEffect(() => {
+      console.log(create)
+    
+    }, [create])
+    
+
     return (
         <AuthenticatedLayout
             user={auth.user}
@@ -39,7 +46,11 @@ export default function Dashboard({ auth, posts }) {
                 <div className='flex flex-row items-center justify-between'>
                     <h2 className="font-semibold text-xl text-gray-800 leading-tight">Dashboard</h2>
                     <PrimaryButton
-                        onClick={() => {}}
+                        onClick={() => {
+                            router.visit('/dashboard/create', {
+                                only: ['create']
+                            })
+                        }}
                     >
                         <div className='flex flex-row items-center space-x-2.5'>
                             <MdAdd size={16} />
@@ -76,12 +87,12 @@ export default function Dashboard({ auth, posts }) {
                                 ]}
                             />
                         </div>
-                        <label htmlFor="table-search" className="sr-only">Search</label>
                         <div className="relative w-[400px]">
                             <div className="absolute inset-y-0 left-0 rtl:inset-r-0 rtl:right-0 flex items-center ps-3 pointer-events-none">
                                 <MdSearch />
                             </div>
-                            <TextInput 
+                            <label htmlFor="table-search" className="sr-only">Search</label>
+                            <TextInput
                                 type="search"
                                 className="ps-10 block w-full"
                                 placeholder="Search for items"
@@ -103,7 +114,7 @@ export default function Dashboard({ auth, posts }) {
                                 {posts && posts.data.map((post, index) => (
                                     <tr key={post.id} className='bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600'>
                                         <td className='pl-6 py-4'>
-                                            {index + 1}
+                                            {posts.from + index}
                                         </td>
                                         <th scope="row" className="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                                             {post.title}
@@ -151,6 +162,8 @@ export default function Dashboard({ auth, posts }) {
                     </nav>
                 </div>
             </div>
+
+            <ModalFormPost show={create} />
         </AuthenticatedLayout>
     );
 }
