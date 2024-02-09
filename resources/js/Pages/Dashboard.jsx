@@ -8,11 +8,10 @@ import { MdOutlineEdit, MdDeleteOutline, MdAdd, MdSearch } from "react-icons/md"
 import { useState, useEffect } from 'react';
 import ModalFormPost from '@/Components/ModalFormPost';
 
-export default function Dashboard({ auth, posts, create }) {
-    const { props } = usePage()
+export default function Dashboard({ auth, posts, openForm, post }) {
     const [perPage, setPerPage] = useState({
-        value: props.posts.per_page,
-        label: `${props.posts.per_page}`
+        value: posts.per_page,
+        label: `${posts.per_page}`
     })
     const cols = [
         "no", "title", "author", "actions"
@@ -24,20 +23,15 @@ export default function Dashboard({ auth, posts, create }) {
             route().current(),
             {
                 per_page: data.value,
-                page: props.posts.current_page,
+                page: posts.current_page,
             },
             {
                 preserveScroll: true,
-                preserveState: true
+                preserveState: true,
+                replace: false
             }
         )
     }
-
-    useEffect(() => {
-      console.log(create)
-    
-    }, [create])
-    
 
     return (
         <AuthenticatedLayout
@@ -48,7 +42,7 @@ export default function Dashboard({ auth, posts, create }) {
                     <PrimaryButton
                         onClick={() => {
                             router.visit('/dashboard/create', {
-                                only: ['create']
+                                only: ['openForm']
                             })
                         }}
                     >
@@ -125,6 +119,11 @@ export default function Dashboard({ auth, posts, create }) {
                                         <td className='flex flex-row items-center space-x-2 px-6 py-4'>
                                             <IconButton
                                                 children={<MdOutlineEdit size={16} />}
+                                                onClick={() => {
+                                                    router.visit(`/dashboard/edit/${post.id}`, {
+                                                        only: ['post', 'openForm']
+                                                    })
+                                                }}
                                             />
                                             <IconButton
                                                 color='bg-red-500'
@@ -163,7 +162,10 @@ export default function Dashboard({ auth, posts, create }) {
                 </div>
             </div>
 
-            <ModalFormPost show={create} />
+            <ModalFormPost
+                show={openForm}
+                edit={post}
+            />
         </AuthenticatedLayout>
     );
 }

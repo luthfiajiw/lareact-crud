@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PostRequest;
 use App\Models\Post;
+use App\Services\PostService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -11,25 +12,20 @@ use Inertia\Response;
 
 class DashboardController extends Controller
 {
-    public function index(Request $request) : Response
+    private PostService $postService;
+
+    public function __construct(PostService $postService) {
+        $this->postService = $postService;
+    }
+
+    public function index(Request $request, ?string $id = null) : Response
     {
-        $posts = Post::with(['user' => function ($query) {
-            $query->select('id', 'name', 'email');
-        }])->select('id', 'title', 'user_id')->paginate($request->per_page ?? 10);
-
-        $posts = $posts->withQueryString();
-
         $path = $request->path();
 
         return Inertia::render('Dashboard', [
-            // ALWAYS included on first visit...
-            // OPTIONALLY included on partial reloads...
-            // ONLY evaluated when needed...
-            'posts' => fn () => $posts,
-            // NEVER included on first visit...
-            // OPTIONALLY included on partial reloads...
-            // ONLY evaluated when needed...
-            'create' => Inertia::lazy(fn () => $path === 'dashboard/create')
+            'posts' => fn () => $this->postService->getPosts($request->per_page ?? 10),
+            'post' => Inertia::lazy(fn () => $this->postService->getPost($id)),
+            'openForm' => Inertia::lazy(fn () => $path === 'dashboard/create' || !is_null($id))
         ]);
     }
 
@@ -38,11 +34,13 @@ class DashboardController extends Controller
         $data = $request->validated();
         $user = $request->user();
         
-        $post = new Post();
-        $post->title = $data["title"];
-        $post->slug = str($data["title"])->slug('-');
-        $post->description = $data["description"];
-        $post->user_id = $user["id"];
-        $post->save();
+        $this->postService->addPost($data, $user);
+    }
+
+    public function update(PostRequest $request, string $id)
+    {
+        $data = $request->validated();
+
+        $this->postService->updatePost($data, $id);
     }
 }

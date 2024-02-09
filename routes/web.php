@@ -25,11 +25,15 @@ Route::get('/', function () {
 });
 
 Route::middleware('auth')->group(function () {
-    Route::prefix('dashboard')->group(function () {
-        Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-        Route::get('/create', [DashboardController::class, 'index'])->name('dashboard.create');
-        Route::post('/create', [DashboardController::class, 'store'])->name('dashboard.store');
-    });
+    Route::prefix('dashboard')
+        ->controller(DashboardController::class)
+        ->group(function () {
+            Route::get('/', 'index')->name('dashboard');
+            Route::get('/create', 'index')->name('dashboard.create');
+            Route::post('/create', 'store')->name('dashboard.store');
+            Route::get('/edit/{id}', 'index')->name('dashboard.edit');
+            Route::put('/edit/{id}', 'update')->name('dashboard.update');
+        });
 
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

@@ -3,7 +3,7 @@ import InputLabel from "./InputLabel";
 import TextInput from "./TextInput";
 import InputError from "./InputError";
 import Modal from "./Modal";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import TextareaInput from "./TextareaInput";
 import SecondaryButton from "./SecondaryButton";
 import PrimaryButton from "./PrimaryButton";
@@ -15,10 +15,9 @@ export default function ModalFormPost({ show, edit = {} }) {
     data,
     errors,
     setData,
-    reset,
-    clearErrors,
     processing,
-    post
+    post,
+    put
   } = useForm({
     title: edit.title,
     description: edit.description,
@@ -27,16 +26,27 @@ export default function ModalFormPost({ show, edit = {} }) {
   function onSubmit(e) {
     e.preventDefault()
 
-    console.log(data)
-    post(
-      route('dashboard.store'),
-      {
-        only: ['create', 'errors'],
-        onSuccess: () => {
-          router.get(route('dashboard'))
+    if (edit.title) {
+      put(
+        route('dashboard.update', {id: edit.id}),
+        {
+          only: ['openForm', 'errors'],
+          onSuccess: () => {
+            router.get(route('dashboard'))
+          }
         }
-      },
-    )
+      )
+    } else {
+      post(
+        route('dashboard.store'),
+        {
+          only: ['openForm', 'errors'],
+          onSuccess: () => {
+            router.get(route('dashboard'))
+          }
+        },
+      )
+    }
   }
 
   function onClose() {
@@ -47,7 +57,7 @@ export default function ModalFormPost({ show, edit = {} }) {
     <Modal show={show} onClose={onClose}>
       <form onSubmit={onSubmit} className="p-6">
         <h2 className="text-lg font-medium text-gray-900">
-          Add New Post
+          {edit.title ? "Edit" : "Add New"} Post
         </h2>
 
         <div className="mt-6">
@@ -70,6 +80,7 @@ export default function ModalFormPost({ show, edit = {} }) {
             name="description"
             className="block w-full"
             ref={descInput}
+            value={data.description}
             onChange={(e) => setData('description', e.target.value)}
             placeholder = "Write post description here..."
           />
