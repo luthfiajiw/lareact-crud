@@ -1,3 +1,5 @@
+import { CgSpinner } from "react-icons/cg";
+
 export default function DangerButton({ className = '', disabled, children, ...props }) {
     return (
         <button
@@ -9,6 +11,12 @@ export default function DangerButton({ className = '', disabled, children, ...pr
             }
             disabled={disabled}
         >
+            {disabled && (
+                <CgSpinner
+                    className="animate-spin text-white mr-2"
+                    size={16}
+                />
+            )}
             {children}
         </button>
     );

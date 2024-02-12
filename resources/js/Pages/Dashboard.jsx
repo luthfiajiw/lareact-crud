@@ -3,12 +3,18 @@ import Select from '@/Components/Select';
 import PrimaryButton from '@/Components/PrimaryButton';
 import TextInput from '@/Components/TextInput';
 import AuthenticatedLayout from '@/Layouts/AuthenticatedLayout';
-import { Head, Link, router, usePage } from '@inertiajs/react';
+import { Head, Link, router } from '@inertiajs/react';
 import { MdOutlineEdit, MdDeleteOutline, MdAdd, MdSearch } from "react-icons/md";
-import { useState, useEffect } from 'react';
-import ModalFormPost from '@/Components/ModalFormPost';
+import { useState } from 'react';
+import ModalFormPost from '@/Components/Modal/ModalFormPost';
 
-export default function Dashboard({ auth, posts, openForm, post }) {
+export default function Dashboard({
+    auth,
+    posts,
+    post,
+    openForm,
+    confirmDelete
+}) {
     const [perPage, setPerPage] = useState({
         value: posts.per_page,
         label: `${posts.per_page}`
@@ -28,7 +34,7 @@ export default function Dashboard({ auth, posts, openForm, post }) {
             {
                 preserveScroll: true,
                 preserveState: true,
-                replace: false
+                replace: true
             }
         )
     }

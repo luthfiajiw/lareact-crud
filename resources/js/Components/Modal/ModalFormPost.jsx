@@ -1,12 +1,12 @@
 import { router, useForm } from "@inertiajs/react";
-import InputLabel from "./InputLabel";
-import TextInput from "./TextInput";
-import InputError from "./InputError";
-import Modal from "./Modal";
+import InputLabel from "../InputLabel";
+import TextInput from "../TextInput";
+import InputError from "../InputError";
+import Modal from "../Modal";
 import { useEffect, useRef } from "react";
-import TextareaInput from "./TextareaInput";
-import SecondaryButton from "./SecondaryButton";
-import PrimaryButton from "./PrimaryButton";
+import TextareaInput from "../TextareaInput";
+import SecondaryButton from "../SecondaryButton";
+import PrimaryButton from "../PrimaryButton";
 
 export default function ModalFormPost({ show, edit = {} }) {
   const titleInput = useRef()
@@ -32,7 +32,13 @@ export default function ModalFormPost({ show, edit = {} }) {
         {
           only: ['openForm', 'errors'],
           onSuccess: () => {
-            router.get(route('dashboard'))
+            router.get(
+              route('dashboard'),
+              undefined,
+              {
+                replace: true
+              }
+            )
           }
         }
       )
@@ -42,7 +48,13 @@ export default function ModalFormPost({ show, edit = {} }) {
         {
           only: ['openForm', 'errors'],
           onSuccess: () => {
-            router.get(route('dashboard'))
+            router.get(
+              route('dashboard'),
+              undefined,
+              {
+                replace: true
+              }
+            )
           }
         },
       )

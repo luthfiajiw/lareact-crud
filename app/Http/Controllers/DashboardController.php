@@ -25,7 +25,8 @@ class DashboardController extends Controller
         return Inertia::render('Dashboard', [
             'posts' => fn () => $this->postService->getPosts($request->per_page ?? 10),
             'post' => Inertia::lazy(fn () => $this->postService->getPost($id)),
-            'openForm' => Inertia::lazy(fn () => $path === 'dashboard/create' || !is_null($id))
+            'openForm' => Inertia::lazy(fn () => $path === 'dashboard/create' || $path === "dashboard/edit/$id"),
+            'confirmDelete' => Inertia::lazy(fn () => $path === "dashboard/delete/$id")
         ]);
     }
 
